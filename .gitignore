@@ -1,0 +1,13 @@
+# Rust build artifacts
+target/
+**/target/
+
+# Node artifacts
+node_modules/
+dist/
+build/
+
+# OS/editor files
+.DS_Store
+.idea/
+.vscode/
