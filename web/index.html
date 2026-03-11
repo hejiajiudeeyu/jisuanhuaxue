@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>鸟群模型 (Boids) 可视化仿真</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <div id="canvas-container">
+            <canvas id="canvas"></canvas>
+            <div id="overlay-info">
+                <span id="fps-counter">FPS: --</span>
+                <span id="time-indicator"></span>
+            </div>
+        </div>
+        <aside id="panel">
+            <h1>鸟群仿真系统</h1>
+            <p class="subtitle">Boids Flocking Simulation · 环形边界</p>
+
+            <section class="panel-section">
+                <h2 class="section-toggle" data-target="time-body">时间控制</h2>
+                <div id="time-body" class="section-body open">
+                    <div class="param">
+                        <label>时间流速 <span class="val" id="val-timeScale">1</span>x</label>
+                        <input type="range" id="timeScale" min="-10" max="10" value="1" step="1">
+                        <div class="time-marks">
+                            <span>-10x 慢放</span><span>0 暂停</span><span>+10x 快进</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel-section">
+                <h2 class="section-toggle" data-target="presets-body">预设场景 (对比实验)</h2>
+                <div id="presets-body" class="section-body open">
+                    <div class="experiment-info">
+                        <div class="exp-progress-wrap">
+                            <div class="exp-progress-bar" id="exp-progress-bar"></div>
+                        </div>
+                        <div class="exp-status" id="exp-status">点击预设按钮开始 30 秒定时实验</div>
+                    </div>
+                    <div class="preset-group">
+                        <h3>多眼效应 Many-Eyes</h3>
+                        <div class="preset-buttons">
+                            <button class="preset-btn" data-preset="manyeyes-a">A 个体模式</button>
+                            <button class="preset-btn" data-preset="manyeyes-b">B 群体模式</button>
+                        </div>
+                    </div>
+                    <div class="preset-group">
+                        <h3>稀释效应 Dilution</h3>
+                        <div class="preset-buttons">
+                            <button class="preset-btn" data-preset="dilution-a">A 小群 (30)</button>
+                            <button class="preset-btn" data-preset="dilution-b">B 大群 (300)</button>
+                        </div>
+                    </div>
+                    <div class="preset-group">
+                        <h3>混淆效应 Confusion</h3>
+                        <div class="preset-buttons">
+                            <button class="preset-btn" data-preset="confusion-a">A 无混淆</button>
+                            <button class="preset-btn" data-preset="confusion-b">B 有混淆</button>
+                        </div>
+                    </div>
+                    <div class="preset-group">
+                        <h3>自私兽群 Selfish Herd</h3>
+                        <div class="preset-buttons">
+                            <button class="preset-btn" data-preset="selfish-a">A 松散群体</button>
+                            <button class="preset-btn" data-preset="selfish-b">B 紧密群体</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel-section">
+                <h2 class="section-toggle" data-target="stats-body">统计仪表盘</h2>
+                <div id="stats-body" class="section-body open">
+                    <div class="stat-row highlight"><span>实验捕获率 (次/秒)</span><span id="stat-exp-rate">--</span></div>
+                    <div class="stat-row"><span>总捕获数</span><span id="stat-captures">0</span></div>
+                    <div class="stat-row"><span>实时捕获率 (次/秒)</span><span id="stat-rate">0.00</span></div>
+                    <div class="stat-row"><span>攻击成功率</span><span id="stat-success">0%</span></div>
+                    <div class="stat-row"><span>平均反应时间</span><span id="stat-reaction">--</span></div>
+                    <div class="stat-row"><span>群体紧密度</span><span id="stat-compact">--</span></div>
+                    <div class="stat-row"><span>边缘被捕比例</span><span id="stat-edge">--</span></div>
+                    <div class="stat-row"><span>目标切换次数</span><span id="stat-switches">0</span></div>
+                    <div class="stat-row"><span>存活鸟数</span><span id="stat-alive">--</span></div>
+                </div>
+            </section>
+
+            <section class="panel-section">
+                <h2 class="section-toggle" data-target="boid-params-body">鸟群参数</h2>
+                <div id="boid-params-body" class="section-body open">
+                    <div class="param">
+                        <label>数量 <span class="val" id="val-numBoids">200</span></label>
+                        <input type="range" id="numBoids" min="10" max="500" value="200" step="1">
+                    </div>
+                    <div class="param">
+                        <label>视觉范围 <span class="val" id="val-visualRange">75</span></label>
+                        <input type="range" id="visualRange" min="20" max="150" value="75" step="1">
+                    </div>
+                    <div class="param">
+                        <label>保护范围 <span class="val" id="val-protectedRange">15</span></label>
+                        <input type="range" id="protectedRange" min="5" max="50" value="15" step="1">
+                    </div>
+                    <div class="param">
+                        <label>分离权重 <span class="val" id="val-avoidanceFactor">0.05</span></label>
+                        <input type="range" id="avoidanceFactor" min="0.01" max="0.20" value="0.05" step="0.005">
+                    </div>
+                    <div class="param">
+                        <label>对齐权重 <span class="val" id="val-matchingFactor">0.05</span></label>
+                        <input type="range" id="matchingFactor" min="0.01" max="0.20" value="0.05" step="0.005">
+                    </div>
+                    <div class="param">
+                        <label>聚合权重 <span class="val" id="val-centeringFactor">0.005</span></label>
+                        <input type="range" id="centeringFactor" min="0.001" max="0.020" value="0.005" step="0.001">
+                    </div>
+                    <div class="param">
+                        <label>最大速度 <span class="val" id="val-maxSpeed">6</span></label>
+                        <input type="range" id="maxSpeed" min="2" max="10" value="6" step="0.5">
+                    </div>
+                    <div class="param">
+                        <label>最小速度 <span class="val" id="val-minSpeed">3</span></label>
+                        <input type="range" id="minSpeed" min="1" max="5" value="3" step="0.5">
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel-section">
+                <h2 class="section-toggle" data-target="pred-params-body">捕食者参数</h2>
+                <div id="pred-params-body" class="section-body open">
+                    <div class="param">
+                        <label>捕食者数量 <span class="val" id="val-numPredators">1</span></label>
+                        <input type="range" id="numPredators" min="0" max="5" value="1" step="1">
+                    </div>
+                    <div class="param">
+                        <label>逃离范围 <span class="val" id="val-fleeRange">150</span></label>
+                        <input type="range" id="fleeRange" min="50" max="300" value="150" step="5">
+                    </div>
+                    <div class="param">
+                        <label>逃离强度 <span class="val" id="val-fleeFactor">0.5</span></label>
+                        <input type="range" id="fleeFactor" min="0.1" max="2.0" value="0.5" step="0.05">
+                    </div>
+                    <div class="param">
+                        <label>捕食者速度 <span class="val" id="val-predatorSpeed">4</span></label>
+                        <input type="range" id="predatorSpeed" min="2" max="8" value="4" step="0.5">
+                    </div>
+                    <div class="param">
+                        <label>追击强度 <span class="val" id="val-chaseFactor">0.03</span></label>
+                        <input type="range" id="chaseFactor" min="0.01" max="0.10" value="0.03" step="0.005">
+                    </div>
+                    <div class="param">
+                        <label>捕获半径 <span class="val" id="val-captureRadius">10</span></label>
+                        <input type="range" id="captureRadius" min="5" max="30" value="10" step="1">
+                    </div>
+                    <div class="param">
+                        <label>混淆阈值 <span class="val" id="val-confusionThreshold">5</span></label>
+                        <input type="range" id="confusionThreshold" min="1" max="20" value="5" step="1">
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel-section">
+                <h2 class="section-toggle" data-target="display-body">显示选项</h2>
+                <div id="display-body" class="section-body open">
+                    <label class="check-label"><input type="checkbox" id="showRange"> 显示感知范围</label>
+                    <label class="check-label"><input type="checkbox" id="showTrails"> 显示尾迹</label>
+                    <label class="check-label"><input type="checkbox" id="showTargetLine" checked> 显示锁定线</label>
+                    <label class="check-label"><input type="checkbox" id="highlightEdge"> 高亮边缘个体</label>
+                    <label class="check-label"><input type="checkbox" id="preferEdge"> 捕食者攻击边缘</label>
+                </div>
+            </section>
+
+            <div class="action-buttons">
+                <button id="btn-pause">暂停</button>
+                <button id="btn-reset">重置</button>
+            </div>
+        </aside>
+    </div>
+    <script type="module" src="main.js"></script>
+</body>
+</html>
