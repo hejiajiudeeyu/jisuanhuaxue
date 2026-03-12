@@ -98,3 +98,4 @@ python3 -m http.server 8080
 
 详细预设参数请参阅 [presets.md](presets.md)。
 四大机制原理请参阅 [mechanisms.md](mechanisms.md)。
+建模与功能改进记录请参阅 [improvements.md](improvements.md)。

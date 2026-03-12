@@ -1,0 +1,14 @@
+{
+  "basePresetA": "manyeyes-a",
+  "basePresetB": "manyeyes-b",
+  "sweep": {
+    "params": {
+      "visualRange": [40, 70, 100],
+      "alertSpread": [0.75, 0.85, 0.95]
+    },
+    "applyTo": "both"
+  },
+  "repeats": 6,
+  "baseSeed": 42011,
+  "durationFrames": 1800
+}

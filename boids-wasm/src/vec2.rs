@@ -19,18 +19,6 @@ impl Vec2 {
         self.length_sq().sqrt()
     }
 
-    pub fn normalized(self) -> Self {
-        let len = self.length();
-        if len < 1e-9 {
-            Self::default()
-        } else {
-            Self {
-                x: self.x / len,
-                y: self.y / len,
-            }
-        }
-    }
-
     pub fn clamp_length(self, min: f32, max: f32) -> Self {
         let len = self.length();
         if len < 1e-9 {
@@ -44,12 +32,17 @@ impl Vec2 {
         }
     }
 
-    pub fn distance_sq(self, other: Self) -> f32 {
-        (self - other).length_sq()
+    pub fn normalized(self) -> Self {
+        let len = self.length();
+        if len < 1e-9 {
+            Self::default()
+        } else {
+            self * (1.0 / len)
+        }
     }
 
-    pub fn distance(self, other: Self) -> f32 {
-        self.distance_sq(other).sqrt()
+    pub fn dot(self, other: Self) -> f32 {
+        self.x * other.x + self.y * other.y
     }
 
     pub fn wrap_pos(self, w: f32, h: f32) -> Self {

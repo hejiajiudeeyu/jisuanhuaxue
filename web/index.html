@@ -8,171 +8,402 @@
 </head>
 <body>
     <div id="app">
+        <aside id="results-panel">
+            <div class="panel-scroll results-scroll">
+                <h1>数据面板</h1>
+                <p class="subtitle">Metrics · Timeline · Comparison</p>
+
+                <section class="panel-section">
+                    <h2 class="section-toggle" data-target="stats-body">状态概览</h2>
+                    <div id="stats-body" class="section-body open">
+                        <div class="data-card-grid">
+                            <article class="data-card">
+                                <div class="data-card-head">
+                                    <span>实验捕获率</span>
+                                    <span class="data-card-badge" id="stat-exp-rate-band">待运行</span>
+                                </div>
+                                <div class="data-card-value" id="stat-exp-rate">--</div>
+                                <p class="data-card-note">越高表示当前参数下个体整体风险越高。</p>
+                            </article>
+                            <article class="data-card">
+                                <div class="data-card-head">
+                                    <span>攻击成功率</span>
+                                    <span class="data-card-badge" id="stat-success-band">待运行</span>
+                                </div>
+                                <div class="data-card-value" id="stat-success">0%</div>
+                                <p class="data-card-note">反映捕食者是否能稳定完成锁定与截获。</p>
+                            </article>
+                            <article class="data-card">
+                                <div class="data-card-head">
+                                    <span>平均反应时间</span>
+                                    <span class="data-card-badge" id="stat-reaction-band">待运行</span>
+                                </div>
+                                <div class="data-card-value" id="stat-reaction">--</div>
+                                <p class="data-card-note">越短表示群体更快进入有组织的规避状态。</p>
+                            </article>
+                            <article class="data-card">
+                                <div class="data-card-head">
+                                    <span>警戒覆盖率</span>
+                                    <span class="data-card-badge" id="stat-alert-band">待运行</span>
+                                </div>
+                                <div class="data-card-value" id="stat-alert-coverage">--</div>
+                                <p class="data-card-note">显示有多少活跃个体已经进入明显警戒。</p>
+                            </article>
+                            <article class="data-card">
+                                <div class="data-card-head">
+                                    <span>存活鸟数</span>
+                                    <span class="data-card-badge" id="stat-alive-band">待运行</span>
+                                </div>
+                                <div class="data-card-value" id="stat-alive">--</div>
+                                <p class="data-card-note">用于快速判断当前条件下总体损失有多大。</p>
+                            </article>
+                            <article class="data-card">
+                                <div class="data-card-head">
+                                    <span>群体紧密度</span>
+                                    <span class="data-card-badge" id="stat-compact-band">待运行</span>
+                                </div>
+                                <div class="data-card-value" id="stat-compact">--</div>
+                                <p class="data-card-note">由紧到松反映群体是否保持了整体性与中心保护。</p>
+                            </article>
+                        </div>
+
+                        <div class="secondary-metrics">
+                            <div class="insight-title">辅助诊断</div>
+                            <div class="secondary-grid">
+                                <div class="stat-row"><span>总捕获数</span><span id="stat-captures">0</span></div>
+                                <div class="stat-row"><span>实时捕获率</span><span id="stat-rate">0.00</span></div>
+                                <div class="stat-row"><span>首次预警延迟</span><span id="stat-first-alert">--</span></div>
+                                <div class="stat-row"><span>边缘被捕比例</span><span id="stat-edge">--</span></div>
+                                <div class="stat-row"><span>目标切换次数</span><span id="stat-switches">0</span></div>
+                                <div class="stat-row"><span>平均锁定时长</span><span id="stat-lock">--</span></div>
+                                <div class="stat-row"><span>平均混淆强度</span><span id="stat-confusion">--</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel-section">
+                    <h2 class="section-toggle" data-target="results-body">实验结论</h2>
+                    <div id="results-body" class="section-body open">
+                        <div class="compare-card" id="compare-summary">运行至少两次实验后显示对比摘要</div>
+                        <div class="compare-grid">
+                            <div class="insight-card">
+                                <div class="insight-title">A/B 结论</div>
+                                <div class="insight-body" id="ab-summary">等待同机制 A/B 实验对。</div>
+                            </div>
+                            <div class="insight-card">
+                                <div class="insight-title">批量波动对比</div>
+                                <svg id="batch-compare-chart" viewBox="0 0 320 136" preserveAspectRatio="none" aria-label="批量波动对比图"></svg>
+                                <div class="insight-body" id="batch-compare-summary">批量运行同机制 A/B 后，这里会显示均值与波动范围。</div>
+                            </div>
+                        </div>
+                        <div class="insight-card timeline-card">
+                            <div class="insight-title">事件时间线</div>
+                            <svg id="run-timeline-chart" viewBox="0 0 320 120" preserveAspectRatio="none" aria-label="最近实验时间线图"></svg>
+                            <div class="timeline-legend">
+                                <span class="legend-item legend-capture">捕获率</span>
+                                <span class="legend-item legend-alert">警戒覆盖</span>
+                                <span class="legend-item legend-confusion">混淆强度</span>
+                            </div>
+                            <div class="insight-body" id="timeline-summary">完成一次实验后显示时间线。</div>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-title">最近实验条带</div>
+                            <div class="timeline-bars" id="records-timeline"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel-section">
+                    <h2 class="section-toggle" data-target="records-section-body">实验记录</h2>
+                    <div id="records-section-body" class="section-body open">
+                        <div class="experiment-actions export-actions">
+                            <button id="btn-export-json">导出 JSON</button>
+                            <button id="btn-export-csv">导出 CSV</button>
+                        </div>
+                        <div class="records-table-wrap">
+                            <table class="records-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>A/B</th>
+                                        <th>Seed</th>
+                                        <th>捕获率 A→B</th>
+                                        <th>成功率 A→B</th>
+                                        <th>反应 Δ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="records-body">
+                                    <tr class="records-empty">
+                                        <td colspan="6">暂无实验记录</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </aside>
+
         <div id="canvas-container">
-            <canvas id="canvas"></canvas>
-            <div id="overlay-info">
-                <span id="fps-counter">FPS: --</span>
-                <span id="time-indicator"></span>
+            <div id="single-stage" class="stage active">
+                <canvas id="canvas"></canvas>
+                <div id="overlay-info">
+                    <span id="fps-counter">FPS: --</span>
+                    <span id="time-indicator"></span>
+                </div>
+            </div>
+            <div id="compare-stage" class="stage">
+                <div class="compare-pane">
+                    <canvas id="canvas-left"></canvas>
+                    <div class="compare-overlay">
+                        <span id="compare-left-label">A 方案</span>
+                        <span id="compare-left-stats">--</span>
+                    </div>
+                </div>
+                <div class="compare-pane">
+                    <canvas id="canvas-right"></canvas>
+                    <div class="compare-overlay">
+                        <span id="compare-right-label">B 方案</span>
+                        <span id="compare-right-stats">--</span>
+                    </div>
+                </div>
             </div>
         </div>
+
         <aside id="panel">
-            <h1>鸟群仿真系统</h1>
-            <p class="subtitle">Boids Flocking Simulation · 环形边界</p>
+            <div class="panel-scroll">
+                <h1>鸟群仿真系统</h1>
+                <p class="subtitle">Boids Flocking Simulation · 环形边界</p>
 
-            <section class="panel-section">
-                <h2 class="section-toggle" data-target="time-body">时间控制</h2>
-                <div id="time-body" class="section-body open">
-                    <div class="param">
-                        <label>时间流速 <span class="val" id="val-timeScale">1</span>x</label>
-                        <input type="range" id="timeScale" min="-10" max="10" value="1" step="1">
-                        <div class="time-marks">
-                            <span>-10x 慢放</span><span>0 暂停</span><span>+10x 快进</span>
+                <section class="panel-section">
+                    <h2 class="section-toggle" data-target="presets-body">预设模板</h2>
+                    <div id="presets-body" class="section-body open">
+                        <div class="preset-explainer">
+                            <div class="preset-explainer-head">
+                                <span id="preset-mechanism">未选择机制</span>
+                                <span id="preset-seed-hint">推荐 Seed: --</span>
+                            </div>
+                            <p id="preset-hypothesis">选择预设后，这里会显示理论预期和建议观察指标。</p>
+                            <div class="preset-metrics" id="preset-metrics"></div>
+                            <p class="preset-reference" id="preset-reference"></p>
+                        </div>
+                        <div class="preset-note">点击预设只会加载参数模板，不会自动启动实验。</div>
+                        <div class="preset-buttons preset-utility-buttons">
+                            <button class="preset-btn preset-utility" data-preset="standard-realistic">标准：现实参考</button>
+                            <button class="preset-btn preset-utility" id="btn-random-preset" type="button">随机：每次重新采样</button>
+                        </div>
+                        <div class="preset-group">
+                            <h3>多眼效应 Many-Eyes</h3>
+                            <div class="preset-buttons">
+                                <button class="preset-btn" data-preset="manyeyes-a">A 个体模式</button>
+                                <button class="preset-btn" data-preset="manyeyes-b">B 群体模式</button>
+                            </div>
+                        </div>
+                        <div class="preset-group">
+                            <h3>稀释效应 Dilution</h3>
+                            <div class="preset-buttons">
+                                <button class="preset-btn" data-preset="dilution-a">A 小群 (30)</button>
+                                <button class="preset-btn" data-preset="dilution-b">B 大群 (300)</button>
+                            </div>
+                        </div>
+                        <div class="preset-group">
+                            <h3>混淆效应 Confusion</h3>
+                            <div class="preset-buttons">
+                                <button class="preset-btn" data-preset="confusion-a">A 无混淆</button>
+                                <button class="preset-btn" data-preset="confusion-b">B 有混淆</button>
+                            </div>
+                        </div>
+                        <div class="preset-group">
+                            <h3>自私兽群 Selfish Herd</h3>
+                            <div class="preset-buttons">
+                                <button class="preset-btn" data-preset="selfish-a">A 松散群体</button>
+                                <button class="preset-btn" data-preset="selfish-b">B 紧密群体</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <section class="panel-section">
-                <h2 class="section-toggle" data-target="presets-body">预设场景 (对比实验)</h2>
-                <div id="presets-body" class="section-body open">
-                    <div class="experiment-info">
-                        <div class="exp-progress-wrap">
-                            <div class="exp-progress-bar" id="exp-progress-bar"></div>
+                <section class="panel-section">
+                    <h2 class="section-toggle" data-target="rules-body">基础规则 Rules Lab</h2>
+                    <div id="rules-body" class="section-body open">
+                        <div class="rules-tabs" id="rules-tabs">
+                            <button class="rules-tab active" data-rule="separation" type="button">分离 Separation</button>
+                            <button class="rules-tab" data-rule="alignment" type="button">对齐 Alignment</button>
+                            <button class="rules-tab" data-rule="cohesion" type="button">聚合 Cohesion</button>
                         </div>
-                        <div class="exp-status" id="exp-status">点击预设按钮开始 30 秒定时实验</div>
-                    </div>
-                    <div class="preset-group">
-                        <h3>多眼效应 Many-Eyes</h3>
-                        <div class="preset-buttons">
-                            <button class="preset-btn" data-preset="manyeyes-a">A 个体模式</button>
-                            <button class="preset-btn" data-preset="manyeyes-b">B 群体模式</button>
-                        </div>
-                    </div>
-                    <div class="preset-group">
-                        <h3>稀释效应 Dilution</h3>
-                        <div class="preset-buttons">
-                            <button class="preset-btn" data-preset="dilution-a">A 小群 (30)</button>
-                            <button class="preset-btn" data-preset="dilution-b">B 大群 (300)</button>
-                        </div>
-                    </div>
-                    <div class="preset-group">
-                        <h3>混淆效应 Confusion</h3>
-                        <div class="preset-buttons">
-                            <button class="preset-btn" data-preset="confusion-a">A 无混淆</button>
-                            <button class="preset-btn" data-preset="confusion-b">B 有混淆</button>
+                        <div class="rules-lab">
+                            <div class="rules-canvas-wrap">
+                                <canvas id="rules-canvas"></canvas>
+                                <div class="rules-overlay">
+                                    <span id="rules-title">分离 Separation</span>
+                                    <span id="rules-param">avoidanceFactor ↑</span>
+                                </div>
+                            </div>
+                            <div class="rules-copy">
+                                <p id="rules-definition">避免局部碰撞，保持个体间安全距离。</p>
+                                <p id="rules-effect">在本系统中会表现为个体相互排斥、队形更疏开。</p>
+                                <div class="preset-metrics" id="rules-tags"></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="preset-group">
-                        <h3>自私兽群 Selfish Herd</h3>
-                        <div class="preset-buttons">
-                            <button class="preset-btn" data-preset="selfish-a">A 松散群体</button>
-                            <button class="preset-btn" data-preset="selfish-b">B 紧密群体</button>
+                </section>
+
+                <section class="panel-section">
+                    <h2 class="section-toggle" data-target="experiment-body">实验控制</h2>
+                    <div id="experiment-body" class="section-body open">
+                        <div class="experiment-info">
+                            <div class="exp-progress-wrap">
+                                <div class="exp-progress-bar" id="exp-progress-bar"></div>
+                            </div>
+                            <div class="exp-status" id="exp-status">先加载预设或调整参数，再手动启动实验。</div>
+                        </div>
+                        <div class="compare-mode-row">
+                            <label class="check-label"><input type="checkbox" id="compareMode"> 双画布同屏对照</label>
+                        </div>
+                        <div id="compare-controls" class="compare-controls">
+                            <div class="compare-control-head">A/B 条件模板</div>
+                            <div class="compare-selects">
+                                <label>A 条件
+                                    <select id="compareLeftPreset"></select>
+                                </label>
+                                <label>B 条件
+                                    <select id="compareRightPreset"></select>
+                                </label>
+                            </div>
+                            <button id="btn-compare-run" type="button">展示 A/B</button>
+                        </div>
+                        <label class="check-label"><input type="checkbox" id="useFixedSeed"> 使用固定 Seed</label>
+                        <div class="seed-row">
+                            <label for="seedInput">Seed</label>
+                            <input type="number" id="seedInput" min="1" step="1" value="20260312">
+                            <button id="btn-randomize-seed" type="button">随机</button>
+                        </div>
+                        <div class="seed-current">当前 Seed: <span id="current-seed">--</span></div>
+                        <div class="experiment-actions">
+                            <button id="btn-run">运行 A/B 一次</button>
+                            <button id="btn-batch">批量运行 A/B</button>
+                            <button id="btn-stop" disabled>停止</button>
+                        </div>
+                        <div class="param compact">
+                            <label>批量次数 <span class="val" id="val-batchCount">5</span></label>
+                            <input type="range" id="batchCount" min="2" max="20" value="5" step="1">
+                        </div>
+                        <div class="param">
+                            <label>时间流速 <span class="val" id="val-timeScale">1</span>x</label>
+                            <input type="range" id="timeScale" min="-10" max="10" value="1" step="1">
+                            <div class="time-marks">
+                                <span>-10x 慢放</span><span>0 暂停</span><span>+10x 快进</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <section class="panel-section">
-                <h2 class="section-toggle" data-target="stats-body">统计仪表盘</h2>
-                <div id="stats-body" class="section-body open">
-                    <div class="stat-row highlight"><span>实验捕获率 (次/秒)</span><span id="stat-exp-rate">--</span></div>
-                    <div class="stat-row"><span>总捕获数</span><span id="stat-captures">0</span></div>
-                    <div class="stat-row"><span>实时捕获率 (次/秒)</span><span id="stat-rate">0.00</span></div>
-                    <div class="stat-row"><span>攻击成功率</span><span id="stat-success">0%</span></div>
-                    <div class="stat-row"><span>平均反应时间</span><span id="stat-reaction">--</span></div>
-                    <div class="stat-row"><span>群体紧密度</span><span id="stat-compact">--</span></div>
-                    <div class="stat-row"><span>边缘被捕比例</span><span id="stat-edge">--</span></div>
-                    <div class="stat-row"><span>目标切换次数</span><span id="stat-switches">0</span></div>
-                    <div class="stat-row"><span>存活鸟数</span><span id="stat-alive">--</span></div>
-                </div>
-            </section>
+                <section class="panel-section">
+                    <h2 class="section-toggle" data-target="boid-params-body">鸟群参数</h2>
+                    <div id="boid-params-body" class="section-body open">
+                        <div class="param">
+                            <label>数量 <span class="val" id="val-numBoids">200</span></label>
+                            <input type="range" id="numBoids" min="10" max="500" value="200" step="1">
+                        </div>
+                        <div class="param">
+                            <label>视觉范围 <span class="val" id="val-visualRange">75</span></label>
+                            <input type="range" id="visualRange" min="20" max="150" value="75" step="1">
+                        </div>
+                        <div class="param">
+                            <label>视野角度 <span class="val" id="val-viewAngle">240</span></label>
+                            <input type="range" id="viewAngle" min="90" max="360" value="240" step="5">
+                        </div>
+                        <div class="param">
+                            <label>保护范围 <span class="val" id="val-protectedRange">15</span></label>
+                            <input type="range" id="protectedRange" min="5" max="50" value="15" step="1">
+                        </div>
+                        <div class="param">
+                            <label>分离权重 <span class="val" id="val-avoidanceFactor">0.05</span></label>
+                            <input type="range" id="avoidanceFactor" min="0.01" max="0.20" value="0.05" step="0.005">
+                        </div>
+                        <div class="param">
+                            <label>对齐权重 <span class="val" id="val-matchingFactor">0.05</span></label>
+                            <input type="range" id="matchingFactor" min="0.01" max="0.20" value="0.05" step="0.005">
+                        </div>
+                        <div class="param">
+                            <label>聚合权重 <span class="val" id="val-centeringFactor">0.005</span></label>
+                            <input type="range" id="centeringFactor" min="0.001" max="0.020" value="0.005" step="0.001">
+                        </div>
+                        <div class="param">
+                            <label>最大速度 <span class="val" id="val-maxSpeed">6</span></label>
+                            <input type="range" id="maxSpeed" min="2" max="10" value="6" step="0.5">
+                        </div>
+                        <div class="param">
+                            <label>最小速度 <span class="val" id="val-minSpeed">3</span></label>
+                            <input type="range" id="minSpeed" min="1" max="5" value="3" step="0.5">
+                        </div>
+                    </div>
+                </section>
 
-            <section class="panel-section">
-                <h2 class="section-toggle" data-target="boid-params-body">鸟群参数</h2>
-                <div id="boid-params-body" class="section-body open">
-                    <div class="param">
-                        <label>数量 <span class="val" id="val-numBoids">200</span></label>
-                        <input type="range" id="numBoids" min="10" max="500" value="200" step="1">
+                <section class="panel-section">
+                    <h2 class="section-toggle" data-target="pred-params-body">捕食者参数</h2>
+                    <div id="pred-params-body" class="section-body open">
+                        <div class="param">
+                            <label>捕食者数量 <span class="val" id="val-numPredators">1</span></label>
+                            <input type="range" id="numPredators" min="0" max="5" value="1" step="1">
+                        </div>
+                        <div class="param">
+                            <label>逃离范围 <span class="val" id="val-fleeRange">150</span></label>
+                            <input type="range" id="fleeRange" min="50" max="300" value="150" step="5">
+                        </div>
+                        <div class="param">
+                            <label>逃离强度 <span class="val" id="val-fleeFactor">0.5</span></label>
+                            <input type="range" id="fleeFactor" min="0.1" max="2.0" value="0.5" step="0.05">
+                        </div>
+                        <div class="param">
+                            <label>警报传播 <span class="val" id="val-alertSpread">0.88</span></label>
+                            <input type="range" id="alertSpread" min="0.50" max="1.00" value="0.88" step="0.01">
+                        </div>
+                        <div class="param">
+                            <label>捕食者速度 <span class="val" id="val-predatorSpeed">5</span></label>
+                            <input type="range" id="predatorSpeed" min="2" max="8" value="5" step="0.5">
+                        </div>
+                        <div class="param">
+                            <label>追击强度 <span class="val" id="val-chaseFactor">0.03</span></label>
+                            <input type="range" id="chaseFactor" min="0.01" max="0.10" value="0.03" step="0.005">
+                        </div>
+                        <div class="param">
+                            <label>转向率 <span class="val" id="val-predatorTurnRate">0.16</span></label>
+                            <input type="range" id="predatorTurnRate" min="0.05" max="0.50" value="0.16" step="0.01">
+                        </div>
+                        <div class="param">
+                            <label>捕获半径 <span class="val" id="val-captureRadius">10</span></label>
+                            <input type="range" id="captureRadius" min="5" max="30" value="10" step="1">
+                        </div>
+                        <div class="param">
+                            <label>混淆阈值 <span class="val" id="val-confusionThreshold">5</span></label>
+                            <input type="range" id="confusionThreshold" min="1" max="20" value="5" step="1">
+                        </div>
+                        <div class="param">
+                            <label>锁定帧数 <span class="val" id="val-lockFrames">16</span></label>
+                            <input type="range" id="lockFrames" min="4" max="60" value="16" step="1">
+                        </div>
                     </div>
-                    <div class="param">
-                        <label>视觉范围 <span class="val" id="val-visualRange">75</span></label>
-                        <input type="range" id="visualRange" min="20" max="150" value="75" step="1">
-                    </div>
-                    <div class="param">
-                        <label>保护范围 <span class="val" id="val-protectedRange">15</span></label>
-                        <input type="range" id="protectedRange" min="5" max="50" value="15" step="1">
-                    </div>
-                    <div class="param">
-                        <label>分离权重 <span class="val" id="val-avoidanceFactor">0.05</span></label>
-                        <input type="range" id="avoidanceFactor" min="0.01" max="0.20" value="0.05" step="0.005">
-                    </div>
-                    <div class="param">
-                        <label>对齐权重 <span class="val" id="val-matchingFactor">0.05</span></label>
-                        <input type="range" id="matchingFactor" min="0.01" max="0.20" value="0.05" step="0.005">
-                    </div>
-                    <div class="param">
-                        <label>聚合权重 <span class="val" id="val-centeringFactor">0.005</span></label>
-                        <input type="range" id="centeringFactor" min="0.001" max="0.020" value="0.005" step="0.001">
-                    </div>
-                    <div class="param">
-                        <label>最大速度 <span class="val" id="val-maxSpeed">6</span></label>
-                        <input type="range" id="maxSpeed" min="2" max="10" value="6" step="0.5">
-                    </div>
-                    <div class="param">
-                        <label>最小速度 <span class="val" id="val-minSpeed">3</span></label>
-                        <input type="range" id="minSpeed" min="1" max="5" value="3" step="0.5">
-                    </div>
-                </div>
-            </section>
+                </section>
 
-            <section class="panel-section">
-                <h2 class="section-toggle" data-target="pred-params-body">捕食者参数</h2>
-                <div id="pred-params-body" class="section-body open">
-                    <div class="param">
-                        <label>捕食者数量 <span class="val" id="val-numPredators">1</span></label>
-                        <input type="range" id="numPredators" min="0" max="5" value="1" step="1">
+                <section class="panel-section">
+                    <h2 class="section-toggle" data-target="display-body">显示选项</h2>
+                    <div id="display-body" class="section-body open">
+                        <label class="check-label"><input type="checkbox" id="showRange"> 显示感知范围</label>
+                        <label class="check-label"><input type="checkbox" id="showTrails"> 显示尾迹</label>
+                        <label class="check-label"><input type="checkbox" id="showTargetLine" checked> 显示锁定线</label>
+                        <label class="check-label"><input type="checkbox" id="highlightEdge"> 高亮边缘个体</label>
+                        <label class="check-label"><input type="checkbox" id="preferEdge"> 捕食者攻击边缘</label>
                     </div>
-                    <div class="param">
-                        <label>逃离范围 <span class="val" id="val-fleeRange">150</span></label>
-                        <input type="range" id="fleeRange" min="50" max="300" value="150" step="5">
-                    </div>
-                    <div class="param">
-                        <label>逃离强度 <span class="val" id="val-fleeFactor">0.5</span></label>
-                        <input type="range" id="fleeFactor" min="0.1" max="2.0" value="0.5" step="0.05">
-                    </div>
-                    <div class="param">
-                        <label>捕食者速度 <span class="val" id="val-predatorSpeed">4</span></label>
-                        <input type="range" id="predatorSpeed" min="2" max="8" value="4" step="0.5">
-                    </div>
-                    <div class="param">
-                        <label>追击强度 <span class="val" id="val-chaseFactor">0.03</span></label>
-                        <input type="range" id="chaseFactor" min="0.01" max="0.10" value="0.03" step="0.005">
-                    </div>
-                    <div class="param">
-                        <label>捕获半径 <span class="val" id="val-captureRadius">10</span></label>
-                        <input type="range" id="captureRadius" min="5" max="30" value="10" step="1">
-                    </div>
-                    <div class="param">
-                        <label>混淆阈值 <span class="val" id="val-confusionThreshold">5</span></label>
-                        <input type="range" id="confusionThreshold" min="1" max="20" value="5" step="1">
-                    </div>
-                </div>
-            </section>
+                </section>
+            </div>
 
-            <section class="panel-section">
-                <h2 class="section-toggle" data-target="display-body">显示选项</h2>
-                <div id="display-body" class="section-body open">
-                    <label class="check-label"><input type="checkbox" id="showRange"> 显示感知范围</label>
-                    <label class="check-label"><input type="checkbox" id="showTrails"> 显示尾迹</label>
-                    <label class="check-label"><input type="checkbox" id="showTargetLine" checked> 显示锁定线</label>
-                    <label class="check-label"><input type="checkbox" id="highlightEdge"> 高亮边缘个体</label>
-                    <label class="check-label"><input type="checkbox" id="preferEdge"> 捕食者攻击边缘</label>
+            <div class="panel-footer">
+                <div class="action-buttons">
+                    <button id="btn-pause">暂停</button>
+                    <button id="btn-reset">重置</button>
                 </div>
-            </section>
-
-            <div class="action-buttons">
-                <button id="btn-pause">暂停</button>
-                <button id="btn-reset">重置</button>
             </div>
         </aside>
     </div>
